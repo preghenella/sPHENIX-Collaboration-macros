@@ -22,6 +22,7 @@ void
 G4DSTreader_EICDetector( const char * outputFile = "G4sPHENIXCells.root",//
                          int absorberactive = 1, //
                          bool do_svtx = true, //
+			 bool do_pstof = true, //
                          bool do_cemc = true, //
                          bool do_hcalin = true, //
                          bool do_magnet = true, //
@@ -34,7 +35,8 @@ G4DSTreader_EICDetector( const char * outputFile = "G4sPHENIXCells.root",//
                          bool do_FEMC = true, //
                          bool do_FEMC_twr = true, //
                          bool do_EEMC = true, //
-                         bool do_EEMC_twr = true //
+                         bool do_EEMC_twr = true, //
+			 bool do_RICH = true //
                          )
 {
 
@@ -72,6 +74,11 @@ G4DSTreader_EICDetector( const char * outputFile = "G4sPHENIXCells.root",//
           ana->AddNode("FGEM_3");
           ana->AddNode("FGEM_4");
         }
+
+      if (do_pstof)
+	{
+	  ana->AddNode("PSTOF");
+	}
 
       if (do_cemc)
         {
@@ -125,6 +132,11 @@ G4DSTreader_EICDetector( const char * outputFile = "G4sPHENIXCells.root",//
             ana->AddNode("ABSORBER_EEMC");
         }
 
+      if (do_RICH)
+	{
+	  ana->AddNode("RICH");
+	}
+      
       ana->AddNode("BH_1");
       ana->AddNode("BH_FORWARD_PLUS");
       ana->AddNode("BH_FORWARD_NEG");

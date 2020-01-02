@@ -34,6 +34,7 @@ double no_overlapp = 0.0001; // added to radii to avoid overlapping volumes
 void RunLoadTest() {}
 
 void G4Init(bool do_svtx = true,
+	    bool do_pstof = true,
             bool do_cemc = true,
             bool do_hcalin = true,
             bool do_magnet = true,
@@ -66,6 +67,11 @@ void G4Init(bool do_svtx = true,
       //gROOT->LoadMacro("G4_Svtx_maps_ladders+intt_ladders+tpc_KalmanPatRec.C"); 
       gROOT->LoadMacro("G4_Tracking_EIC.C"); 
       TrackingInit();
+    }
+  if (do_pstof)
+    {
+      gROOT->LoadMacro("G4_PSTOF.C"); 
+      PSTOFInit();
     }
   if (do_cemc)
     {
@@ -138,6 +144,7 @@ int G4Setup(const int absorberactive = 0,
 	    const EDecayType decayType = TPythia6Decayer::kAll,
 #endif
             const bool do_svtx = true,
+	    const bool do_pstof = true,
             const bool do_cemc = true,
             const bool do_hcalin = true,
             const bool do_magnet = true,
@@ -208,6 +215,10 @@ int G4Setup(const int absorberactive = 0,
   //----------------------------------------
   // SVTX
    if (do_svtx) radius = Tracking(g4Reco, radius, absorberactive);
+
+  //----------------------------------------
+  // PSTOF
+   if (do_pstof) radius = PSTOF(g4Reco, radius, absorberactive);
 
   //----------------------------------------
   // CEMC

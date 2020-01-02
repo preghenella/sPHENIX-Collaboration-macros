@@ -37,9 +37,16 @@ R__LOAD_LIBRARY(libg4testbench.so)
 R__LOAD_LIBRARY(libPHPythia6.so)
 R__LOAD_LIBRARY(libPHPythia8.so)
 R__LOAD_LIBRARY(libPHSartre.so)
+
+R__ADD_INCLUDE_PATH($HOME/fun4all-TOF/include)
+#include <tofreco/TOFReco.h>
+R__LOAD_LIBRARY(libtofreco.so)
 #endif
 
 using namespace std;
+
+bool do_simulation = false;
+bool do_tofreco = true;
 
 int Fun4All_G4_EICDetector(
                            const int nEvents = 1,
@@ -58,7 +65,7 @@ int Fun4All_G4_EICDetector(
   //
   // In case reading production output, please double check your G4Setup_sPHENIX.C and G4_*.C consistent with those in the production macro folder
   // E.g. /sphenix/sim//sim01/production/2016-07-21/single_particle/spacal2d/
-  const bool readhits = false;
+  const bool readhits = !do_simulation;
   // Or:
   // read files in HepMC format (typically output from event generators like hijing or pythia)
   const bool readhepmc = false; // read HepMC files
@@ -70,7 +77,7 @@ int Fun4All_G4_EICDetector(
   const bool runpythia8 = false;
   // Or:
   // Use Pythia 6
-  const bool runpythia6 = false;
+  const bool runpythia6 = do_simulation && false;
   // Or:
   // Use HEPGen
   const bool runhepgen = false;
@@ -82,9 +89,9 @@ int Fun4All_G4_EICDetector(
 
   // Besides the above flags. One can further choose to further put in following particles in Geant4 simulation
   // Use multi-particle generator (PHG4SimpleEventGenerator), see the code block below to choose particle species and kinematics
-  const bool particles = true && !readhits;
+  const bool particles = do_simulation && true && !readhits;
   // or gun/ very simple single particle gun generator
-  const bool usegun = false && !readhits;
+  const bool usegun = do_simulation && false && !readhits;
   // Throw single Upsilons, may be embedded in Hijing by setting readhepmc flag also  (note, careful to set Z vertex equal to Hijing events)
   const bool upsilons = false && !readhits;
 
@@ -93,69 +100,69 @@ int Fun4All_G4_EICDetector(
   //======================
 
   // sPHENIX barrel
-  bool do_bbc = true;
+  bool do_bbc = do_simulation;
 
   bool do_pipe = true;
 
-  bool do_tracking = true;
+  bool do_tracking = do_simulation;
   bool do_tracking_cell = do_tracking && true;
   bool do_tracking_track = do_tracking_cell && true;
   bool do_tracking_eval = do_tracking_track && true; // in order to use this evaluation, please build this analysis module analysis/blob/master/Tracking/FastTrackingEval/
   bool do_vertex_finding = false; // this option exclude vertex in the track fitting and use RAVE to reconstruct primary and 2ndary vertexes
 
-  bool do_pstof = false;
+  bool do_pstof = true;
 
-  bool do_cemc = true;
+  bool do_cemc = false;
   bool do_cemc_cell = do_cemc && true;
   bool do_cemc_twr = do_cemc_cell && true;
   bool do_cemc_cluster = do_cemc_twr && true;
   bool do_cemc_eval = do_cemc_cluster && true;
 
-  bool do_hcalin = true;
+  bool do_hcalin = false;
   bool do_hcalin_cell = do_hcalin && true;
   bool do_hcalin_twr = do_hcalin_cell && true;
   bool do_hcalin_cluster = do_hcalin_twr && true;
   bool do_hcalin_eval = do_hcalin_cluster && true;
 
-  bool do_magnet = true;
+  bool do_magnet = false;
 
-  bool do_hcalout = true;
+  bool do_hcalout = false;
   bool do_hcalout_cell = do_hcalout && true;
   bool do_hcalout_twr = do_hcalout_cell && true;
   bool do_hcalout_cluster = do_hcalout_twr && true;
   bool do_hcalout_eval = do_hcalout_cluster && true;
 
   // EICDetector geometry - barrel
-  bool do_DIRC = true;
+  bool do_DIRC = false;
 
   // EICDetector geometry - 'hadron' direction
-  bool do_RICH = true;
-  bool do_Aerogel = true;
+  bool do_RICH = false;
+  bool do_Aerogel = false;
 
-  bool do_FEMC = true;
+  bool do_FEMC = false;
   bool do_FEMC_cell = do_FEMC && true;
   bool do_FEMC_twr = do_FEMC_cell && true;
   bool do_FEMC_cluster = do_FEMC_twr && true;
   bool do_FEMC_eval = do_FEMC_cluster && true;
 
-  bool do_FHCAL = true;
+  bool do_FHCAL = false;
   bool do_FHCAL_cell = do_FHCAL && true;
   bool do_FHCAL_twr = do_FHCAL_cell && true;
   bool do_FHCAL_cluster = do_FHCAL_twr && true;
   bool do_FHCAL_eval = do_FHCAL_cluster && true;
 
   // EICDetector geometry - 'electron' direction
-  bool do_EEMC = true;
+  bool do_EEMC = false;
   bool do_EEMC_cell = do_EEMC && true;
   bool do_EEMC_twr = do_EEMC_cell && true;
   bool do_EEMC_cluster = do_EEMC_twr && true;
   bool do_EEMC_eval = do_EEMC_cluster && true;
 
-  bool do_plugdoor = true;
+  bool do_plugdoor = false;
 
   // Other options
-  bool do_global = true;
-  bool do_global_fastsim = true;
+  bool do_global = do_simulation;
+  bool do_global_fastsim = do_simulation;
 
   bool do_calotrigger = false && do_cemc_twr && do_hcalin_twr && do_hcalout_twr;
 
@@ -164,7 +171,7 @@ int Fun4All_G4_EICDetector(
   bool do_jet_reco = false;
   bool do_jet_eval = do_jet_reco && true;
 
-  bool do_fwd_jet_reco = true;
+  bool do_fwd_jet_reco = false;
   bool do_fwd_jet_eval = do_fwd_jet_reco && true;
 
   // HI Jet Reco for jet simulations in Au+Au (default is false for
@@ -172,8 +179,11 @@ int Fun4All_G4_EICDetector(
   // don't care about jets)
   bool do_HIjetreco = false && do_jet_reco && do_cemc_twr && do_hcalin_twr && do_hcalout_twr;
 
+  // Write DST file
+  bool do_dst_write = do_simulation;
+  
   // Compress DST files
-  bool do_dst_compress = false;
+  bool do_dst_compress = do_dst_write && false;
 
   //Option to convert DST to human command readable TTree for quick poke around the outputs
   bool do_DSTReader = false;
@@ -190,7 +200,7 @@ int Fun4All_G4_EICDetector(
 
   // establish the geometry and reconstruction setup
   gROOT->LoadMacro("G4Setup_EICDetector.C");
-  G4Init(do_tracking,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,do_plugdoor,do_FEMC,do_FHCAL,do_EEMC,do_DIRC,do_RICH,do_Aerogel);
+  G4Init(do_tracking,do_pstof,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,do_plugdoor,do_FEMC,do_FHCAL,do_EEMC,do_DIRC,do_RICH,do_Aerogel);
 
   int absorberactive = 0; // set to 1 to make all absorbers active volumes
   //  const string magfield = "1.5"; // alternatively to specify a constant magnetic field, give a float number, which will be translated to solenoidal field in T, if string use as fieldmap name (including path)
@@ -203,8 +213,9 @@ int Fun4All_G4_EICDetector(
 
   Fun4AllServer *se = Fun4AllServer::instance();
   // se->Verbosity(01); // uncomment for batch production running with minimal output messages
-  // se->Verbosity(Fun4AllServer::VERBOSITY_SOME); // uncomment for some info for interactive running
-
+  se->Verbosity(Fun4AllServer::VERBOSITY_SOME); // uncomment for some info for interactive running
+  //  se->Verbosity(Fun4AllServer::VERBOSITY_MAX);
+  
   // just if we set some flags somewhere in this macro
   recoConsts *rc = recoConsts::instance();
   // By default every random number generator uses
@@ -296,7 +307,7 @@ int Fun4All_G4_EICDetector(
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("pi-",1); // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("gamma", 10); // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option
 
       if (readhepmc)
@@ -314,10 +325,10 @@ int Fun4All_G4_EICDetector(
         }
       gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
       gen->set_vertex_size_parameters(0.0, 0.0);
-      gen->set_eta_range(-3, 3);
+      gen->set_eta_range(-1., 1.);
       gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
       //gen->set_pt_range(0.1, 50.0);
-      gen->set_pt_range(0.1, 20.0);
+      gen->set_pt_range(0.1, 5.0);
       gen->Embed(1);
       gen->Verbosity(0);
 
@@ -338,8 +349,8 @@ int Fun4All_G4_EICDetector(
       PHG4ParticleGenerator *pgen = new PHG4ParticleGenerator();
       pgen->set_name("mu-");
       pgen->set_z_range(0,0);
-      pgen->set_eta_range(-4.0,0.0);
-      pgen->set_mom_range(30,30);
+      pgen->set_eta_range(-1.5,1.5);
+      pgen->set_mom_range(9., 10.);
       pgen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
       se->registerSubsystem(pgen);
     }
@@ -397,12 +408,12 @@ int Fun4All_G4_EICDetector(
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,00,0)
       G4Setup(absorberactive, magfield, EDecayType::kAll,
-              do_tracking,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,do_plugdoor,
+              do_tracking,do_pstof,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,do_plugdoor,
               do_FEMC,do_FHCAL,do_EEMC,do_DIRC,do_RICH,do_Aerogel,
               magfield_rescale);
 #else
       G4Setup(absorberactive, magfield, TPythia6Decayer::kAll,
-              do_tracking,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,do_plugdoor,
+              do_tracking,do_pstof,do_cemc,do_hcalin,do_magnet,do_hcalout,do_pipe,do_plugdoor,
               do_FEMC,do_FHCAL,do_EEMC,do_DIRC,do_RICH,do_Aerogel,
               magfield_rescale);
 #endif
@@ -577,6 +588,7 @@ int Fun4All_G4_EICDetector(
       G4DSTreader_EICDetector( outputFile, //
                                /*int*/ absorberactive ,
                                /*bool*/ do_tracking ,
+                               /*bool*/ do_pstof ,
                                /*bool*/ do_cemc ,
                                /*bool*/ do_hcalin ,
                                /*bool*/ do_magnet ,
@@ -589,14 +601,22 @@ int Fun4All_G4_EICDetector(
                                /*bool*/ do_FEMC,
                                /*bool*/ do_FEMC_twr,
                                /*bool*/ do_EEMC,
-                               /*bool*/ do_EEMC_twr
+                               /*bool*/ do_EEMC_twr,
+			       /*bool*/ do_RICH
                                );
     }
 
-  //Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
-  //if (do_dst_compress) DstCompress(out);
-  //se->registerOutputManager(out);
-
+  if (do_tofreco) {
+    auto tofreco = new TOFReco("TOFReco");
+    se->registerSubsystem(tofreco);
+  }
+  
+  if (do_dst_write) {
+    Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
+    if (do_dst_compress) DstCompress(out);
+    se->registerOutputManager(out);
+  }
+    
   //-----------------
   // Event processing
   //-----------------
@@ -628,3 +648,19 @@ int Fun4All_G4_EICDetector(
 // This function is only used to test if we can load this as root6 macro
 // without running into unresolved libraries and include files
 void RunFFALoadTest() {}
+
+// R+
+int Fun4All_G4_EICDetector_Sim(const int nEvents = 1, const char * outputFile = "G4EICDetector.root")
+{
+  do_simulation = true;
+  do_tofreco = false;
+  return Fun4All_G4_EICDetector(nEvents, nullptr, outputFile);
+}
+
+int Fun4All_G4_EICDetector_Rec(const char * inputFile)
+{
+  do_simulation = false;
+  do_tofreco = true;
+  return Fun4All_G4_EICDetector(0, inputFile, nullptr);
+}
+
